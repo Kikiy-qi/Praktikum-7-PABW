@@ -15,7 +15,7 @@
             <div>
                 <p class="text-slate-400 text-sm mb-2">Tagihan Reservasi Terakhir</p>
                 <h1 class="font-bold text-brand-500 text-4xl mb-2">
-                    Rp {{ number_format($latest->total_biaya ?? 4000, 0, ',', '.') }}
+                    Rp {{ number_format($latest?->total_biaya ?? 0, 0, ',', '.') }}
                 </h1>
                 <span class="text-slate-400 text-xs flex items-center">
                     <i class="bi bi-shield-check mr-1 text-emerald-400"></i> Terverifikasi oleh Sistem ParkTrack
@@ -24,12 +24,12 @@
             <div class="grid grid-cols-2 mt-8 pt-5 border-t border-slate-700">
                 <div class="border-r border-slate-700 pr-4">
                     <p class="text-slate-400 text-sm mb-1">Status Kendaraan</p>
-                    <h4 class="font-bold text-emerald-400 text-lg">{{ $latest->status ?? 'Aktif' }}</h4>
+                    <h4 class="font-bold text-emerald-400 text-lg">{{ $latest?->status ?? '-' }}</h4>
                 </div>
                 <div class="pl-4 text-right">
                     <p class="text-slate-400 text-sm mb-1">Lokasi Slot</p>
                     <h4 class="font-bold text-brand-500 text-lg">
-                        Slot {{ $latest->parkingSlot ? $latest->parkingSlot->kode_slot : 'A-01' }}
+                        Slot {{ $latest?->parkingSlot?->kode_slot ?? '-' }}
                     </h4>
                 </div>
             </div>

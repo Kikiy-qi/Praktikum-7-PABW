@@ -11,7 +11,7 @@ class OfficerController extends Controller
 {
     private function checkOfficer()
     {
-        return session('role') === 'officer';
+        return session('role') === 'officer' || (auth()->check() && auth()->user()->role === 'officer');
     }
 
     public function index()
@@ -103,33 +103,34 @@ class OfficerController extends Controller
         }
 
         $search = $request->input('q', '');
-        $users = [];
 
-        if (!empty($search)) {
-            $usersQuery = User::where('name', 'like', "%{$search}%")
+        $usersQuery = empty($search)
+            ? User::where('role', 'user')->get()
+            : User::where('name', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%")
                 ->orWhere('phone', 'like', "%{$search}%")
                 ->get();
 
+        $merged = collect();
+
+        foreach ($usersQuery as $u) {
+            $history = Reservation::where('nomor_telepon', $u->phone)->orWhere('nama_pengemudi', $u->name)->get();
+            $merged->push([
+                'id' => $u->id,
+                'name' => $u->name,
+                'email' => $u->email,
+                'phone' => $u->phone ?? '-',
+                'wallet_balance' => 150000,
+                'history' => $history,
+                'has_active' => $history->where('status', 'Aktif')->isNotEmpty(),
+            ]);
+        }
+
+        if (!empty($search)) {
             $resUsers = Reservation::where('nama_pengemudi', 'like', "%{$search}%")
                 ->orWhere('plat_nomor', 'like', "%{$search}%")
                 ->orWhere('nomor_telepon', 'like', "%{$search}%")
                 ->get();
-
-            $merged = collect();
-
-            foreach ($usersQuery as $u) {
-                $history = Reservation::where('nomor_telepon', $u->phone)->orWhere('nama_pengemudi', $u->name)->get();
-                $merged->push([
-                    'id' => $u->id,
-                    'name' => $u->name,
-                    'email' => $u->email,
-                    'phone' => $u->phone ?? '-',
-                    'wallet_balance' => 150000,
-                    'history' => $history,
-                    'has_active' => $history->where('status', 'Aktif')->isNotEmpty(),
-                ]);
-            }
 
             foreach ($resUsers as $r) {
                 if (!$merged->contains('name', $r->nama_pengemudi)) {
@@ -145,9 +146,9 @@ class OfficerController extends Controller
                     ]);
                 }
             }
-
-            $users = $merged;
         }
+
+        $users = $merged;
 
         return view('officer.check_user', compact('users', 'search'));
     }

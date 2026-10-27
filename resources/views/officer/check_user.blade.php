@@ -20,7 +20,7 @@
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="bi bi-search text-slate-400"></i>
                     </div>
-                    <input type="text" name="q" value="{{ $search }}" class="w-full bg-slate-900 border border-slate-700 text-slate-50 text-sm rounded-xl focus:ring-brand-500 focus:border-brand-500 block pl-11 p-4" placeholder="Cari berdasarkan nama, email, nomor HP, atau plat nomor kendaraan..." required autofocus>
+                    <input type="text" name="q" value="{{ $search }}" class="w-full bg-slate-900 border border-slate-700 text-slate-50 text-sm rounded-xl focus:ring-brand-500 focus:border-brand-500 block pl-11 p-4" placeholder="Cari berdasarkan nama, email, nomor HP, atau plat nomor kendaraan..." autofocus>
                 </div>
                 <button type="submit" class="bg-brand-500 hover:bg-brand-600 text-white font-bold py-4 px-8 rounded-xl transition-colors shadow">Cari Data</button>
             </form>
