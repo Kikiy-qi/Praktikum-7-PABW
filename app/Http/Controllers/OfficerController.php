@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Parking;
 use App\Models\ParkingSlot;
 use App\Models\Reservation;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class OfficerController extends Controller
 {
@@ -16,7 +17,7 @@ class OfficerController extends Controller
 
     public function index()
     {
-        if (!$this->checkOfficer()) {
+        if (! $this->checkOfficer()) {
             return redirect()->route('login')->with('error', 'Halaman petugas hanya dapat diakses setelah login sebagai petugas.');
         }
 
@@ -65,14 +66,14 @@ class OfficerController extends Controller
 
     public function listParking(Request $request)
     {
-        if (!$this->checkOfficer()) {
+        if (! $this->checkOfficer()) {
             return redirect()->route('login')->with('error', 'Daftar parkir hanya dapat diakses oleh petugas.');
         }
 
         $query = Reservation::with('parkingSlot')->latest();
 
         $search = $request->input('q', '');
-        if (!empty($search)) {
+        if (! empty($search)) {
             $query->where(function ($sub) use ($search) {
                 $sub->where('plat_nomor', 'like', "%{$search}%")
                     ->orWhere('nama_pengemudi', 'like', "%{$search}%");
@@ -98,7 +99,7 @@ class OfficerController extends Controller
 
     public function checkUser(Request $request)
     {
-        if (!$this->checkOfficer()) {
+        if (! $this->checkOfficer()) {
             return redirect()->route('login')->with('error', 'Halaman cek pengguna hanya dapat diakses oleh petugas.');
         }
 
@@ -126,19 +127,19 @@ class OfficerController extends Controller
             ]);
         }
 
-        if (!empty($search)) {
+        if (! empty($search)) {
             $resUsers = Reservation::where('nama_pengemudi', 'like', "%{$search}%")
                 ->orWhere('plat_nomor', 'like', "%{$search}%")
                 ->orWhere('nomor_telepon', 'like', "%{$search}%")
                 ->get();
 
             foreach ($resUsers as $r) {
-                if (!$merged->contains('name', $r->nama_pengemudi)) {
+                if (! $merged->contains('name', $r->nama_pengemudi)) {
                     $history = Reservation::where('nama_pengemudi', $r->nama_pengemudi)->get();
                     $merged->push([
                         'id' => $r->id,
                         'name' => $r->nama_pengemudi,
-                        'email' => strtolower(str_replace(' ', '', $r->nama_pengemudi)) . '@gmail.com',
+                        'email' => strtolower(str_replace(' ', '', $r->nama_pengemudi)).'@gmail.com',
                         'phone' => $r->nomor_telepon,
                         'wallet_balance' => 50000,
                         'history' => $history,
@@ -155,16 +156,30 @@ class OfficerController extends Controller
 
     public function penalty(Request $request)
     {
-        if (!$this->checkOfficer()) {
+        if (! $this->checkOfficer()) {
             return redirect()->route('login')->with('error', 'Halaman denda hanya dapat diakses oleh petugas.');
         }
 
         $success = null;
 
         if ($request->isMethod('post')) {
-            $success = 'Denda sebesar Rp ' . number_format($request->input('amount', 50000), 0, ',', '.') . ' untuk kendaraan ' . strtoupper($request->input('plate')) . ' berhasil dicatat.';
+            $success = 'Denda sebesar Rp '.number_format($request->input('amount', 50000), 0, ',', '.').' untuk kendaraan '.strtoupper($request->input('plate')).' berhasil dicatat.';
         }
 
         return view('officer.penalty', compact('success'));
+    }
+
+    public function reschedule(Request $request, $id)
+    {
+        $request->validate([
+            'waktu_reservasi' => 'required|date',
+        ]);
+
+        $parking = Parking::findOrFail($id);
+        $parking->update([
+            'waktu_reservasi' => $request->waktu_reservasi,
+        ]);
+
+        return back()->with('success', 'Jadwal reservasi untuk plat '.$parking->plat_nomor.' berhasil di-reschedule!');
     }
 }

@@ -49,6 +49,9 @@
                 <a href="{{ route('officer.penalty') }}" class="rounded-full px-5 py-2 text-sm font-medium transition-colors {{ request()->is('officer/penalty*') ? 'bg-brand-500 text-white' : 'text-slate-400 hover:text-white' }}">
                     <i class="bi bi-file-earmark-ruled mr-2"></i>Pengatur Denda
                 </a>
+                <a href="{{ route('pengaduan.index') }}" class="rounded-full px-5 py-2 text-sm font-medium transition-colors {{ request()->is('pengaduan*') ? 'bg-brand-500 text-white' : 'text-slate-400 hover:text-white' }}">
+                    <i class="bi bi-chat-left-dots mr-2"></i>Pengaduan
+                </a>
             @else
                 <a href="/" class="rounded-full px-5 py-2 text-sm font-medium transition-colors {{ request()->is('/') ? 'bg-brand-500 text-white' : 'text-slate-400 hover:text-white' }}">
                     <i class="bi bi-speedometer2 mr-2"></i>Dashboard
@@ -64,6 +67,9 @@
                 </a>
                 <a href="/denda" class="rounded-full px-5 py-2 text-sm font-medium transition-colors {{ request()->is('denda*') ? 'bg-brand-500 text-white' : 'text-slate-400 hover:text-white' }}">
                     <i class="bi bi-exclamation-triangle mr-2"></i>Denda
+                </a>
+                <a href="{{ route('pengaduan.create') }}" class="rounded-full px-5 py-2 text-sm font-medium transition-colors {{ request()->is('pengaduan*') ? 'bg-brand-500 text-white' : 'text-slate-400 hover:text-white' }}">
+                    <i class="bi bi-chat-left-text mr-2"></i>Pengaduan
                 </a>
             @endif
         </div>
